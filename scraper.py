@@ -231,6 +231,12 @@ df['snapshot'] = datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")
 print("Scraping completed")
 
 conn = sqlite3.connect('data.sqlite')
-df.to_sql('data', conn, if_exists='append')
-print('Db successfully constructed and saved')
+old_df = pd.read_sql_query("SELECT * from data", conn)
+old_df = old_df.drop(['index'], axis=1)
+
+if old_df.equals(df):
+    print('No new data to update')
+else:
+    df.to_sql('data', conn, if_exists='append')
+    print('Db successfully constructed and saved')
 conn.close()
